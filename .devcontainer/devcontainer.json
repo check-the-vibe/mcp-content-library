@@ -21,7 +21,7 @@
     }
   },
 
-  "postStartCommand": "nohup python server_http.py > ${containerWorkspaceFolder}/server_http.log 2>&1 &",
+  "postStartCommand": "bash .devcontainer/start-server.sh",
 
   "customizations": {
     "vscode": {

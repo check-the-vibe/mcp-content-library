@@ -1,0 +1,32 @@
+__pycache__/
+.venv/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# MCP Content Library runtime
+.mcp_snippets/
+.claude/
+server.log
+server.pid
+nohup.out
+
+# IDE
+.vscode/*
+!.vscode/mcp.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/

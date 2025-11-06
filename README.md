@@ -1,2 +1,271 @@
-# mcp-content-library
-An MCP server that acts as a editors assistant and content library
+# MCP Content Library
+
+A Model Context Protocol (MCP) server for managing writing content, snippets, and building instant context for AI-assisted writing.
+
+## Features
+
+- **Content Management**: Store and organize content from tweets to full chapters
+- **Graph Relationships**: Link snippets to parent content with typed relationships
+- **Rich Metadata**: Tags, authors, writing styles, and source URL tracking
+- **Full-Text Search**: TF-IDF search with advanced filtering and sorting
+- **Content Extraction**: Break down long-form into snippets with multiple strategies
+- **Social Media Tools**: Extract platform-optimized snippets (Twitter, LinkedIn, Instagram)
+- **Link Tracking**: Associate URLs with content for source attribution
+
+## Quick Start
+
+```bash
+# Clone and setup
+git clone https://github.com/your-username/mcp-content-library.git
+cd mcp-content-library
+
+# Install
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+pip install "mcp[cli]" starlette uvicorn
+
+# Create storage
+mkdir -p ~/.mcp_snippets
+
+# Run server
+python server_http.py  # HTTP mode (recommended)
+# OR
+python server.py       # STDIO mode (for CLI clients)
+```
+
+Server runs at `http://0.0.0.0:8000/mcp` in HTTP mode.
+
+## Connecting to Claude
+
+### Option 1: Claude CLI (Recommended for this project)
+
+The Claude CLI allows you to use MCP servers from the command line.
+
+#### A. Local Configuration (Project-Specific)
+
+Create a Claude config file in this project:
+
+```bash
+# Create config directory
+mkdir -p .claude
+
+# Create the MCP configuration
+cat > .claude/mcp_config.json << 'EOF'
+{
+  "mcpServers": {
+    "content-library": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp"
+    }
+  }
+}
+EOF
+```
+
+**Usage:**
+```bash
+# Start the server
+./start.sh
+
+# In another terminal, use Claude CLI with the local config
+export CLAUDE_MCP_CONFIG=.claude/mcp_config.json
+claude chat
+
+# Or specify it per-command
+claude chat --mcp-config .claude/mcp_config.json
+```
+
+#### B. Global Configuration (All Projects)
+
+Add to your global Claude config at `~/.config/claude/mcp_config.json`:
+
+**For local development:**
+```json
+{
+  "mcpServers": {
+    "content-library": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp"
+    }
+  }
+}
+```
+
+**For GitHub Codespaces (public URL):**
+```json
+{
+  "mcpServers": {
+    "content-library": {
+      "type": "http",
+      "url": "https://ominous-rotary-phone-p7jgg5vq9rh465-8000.app.github.dev/mcp"
+    }
+  }
+}
+```
+
+> **Note:** To get your current public URL, run `./get-public-url.sh`
+
+**Usage:**
+```bash
+# Just use Claude CLI normally - MCP server is auto-loaded
+claude chat
+```
+
+### Option 2: Claude Desktop
+
+Claude Desktop is the native app for macOS and Windows.
+
+#### Configuration
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%/Claude/claude_desktop_config.json`
+
+**For local server:**
+```json
+{
+  "mcpServers": {
+    "content-library": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp"
+    }
+  }
+}
+```
+
+**For GitHub Codespaces (if server is running there):**
+```json
+{
+  "mcpServers": {
+    "content-library": {
+      "type": "http",
+      "url": "https://ominous-rotary-phone-p7jgg5vq9rh465-8000.app.github.dev/mcp"
+    }
+  }
+}
+```
+
+> ⚠️ **Important:** For Codespaces URL to work, you must:
+> 1. Ensure server is running: `./start.sh`
+> 2. Open **Ports** panel in VS Code (View → Ports)
+> 3. Right-click port 8000 → **Port Visibility** → **Public**
+
+#### Activate the Server
+
+1. Save the configuration file
+2. **Restart Claude Desktop completely** (quit and reopen)
+3. Look for the 🔌 plug icon in the UI - this indicates MCP servers are loaded
+4. The content library tools will appear automatically in your conversations
+
+### Option 3: Claude.ai Website
+
+> ⚠️ **Note:** The claude.ai website does **not** currently support custom MCP servers. MCP servers must run locally and connect via Claude Desktop or Claude CLI.
+
+If you want to use this with claude.ai, you'll need to use one of these workarounds:
+- Use **Claude Desktop** instead (same web interface, but native app)
+- Use **Claude CLI** for terminal-based access
+- Wait for Anthropic to add custom MCP support to claude.ai
+
+### Verification
+
+After configuring, verify the connection:
+
+#### Claude CLI
+```bash
+# List available MCP servers
+claude mcp list-servers
+
+# List tools from the content library
+claude mcp list-tools content-library
+
+# Test adding content
+claude mcp call content-library tool_add_content \
+  --content "Test snippet" \
+  --style '["snippet"]' \
+  --tags '["test"]'
+```
+
+#### Claude Desktop
+1. Open Claude Desktop
+2. Start a new conversation
+3. Look for the 🔌 icon (indicates MCP servers loaded)
+4. Try asking: "Can you add a test snippet to my content library with the tag 'test'?"
+5. Claude should use the `tool_add_content` tool automatically
+
+### Getting Your Public URL
+
+If you're running in GitHub Codespaces and need the public URL:
+
+```bash
+./get-public-url.sh
+```
+
+This will display your current public URL that you can use in any Claude client config.
+
+### Troubleshooting
+
+**Claude CLI not finding server:**
+- Verify config file location: `cat ~/.config/claude/mcp_config.json`
+- Check server is running: `curl http://localhost:8000/mcp`
+- Try using local config: `claude chat --mcp-config .claude/mcp_config.json`
+
+**Claude Desktop not showing tools:**
+- Restart Claude Desktop completely
+- Check JSON syntax in config file (use a JSON validator)
+- Ensure URL is correct and server is accessible
+- Look for error messages in Claude Desktop's logs
+
+**Public URL not working:**
+- Ensure server is running: `lsof -i :8000`
+- Check port visibility is set to "Public" in Codespaces
+- Test URL: `curl https://your-url/mcp`
+
+## Documentation
+
+**For complete setup instructions, configuration for all providers (VS Code, Claude CLI, Claude Desktop, Cline), API reference, and usage examples, see:**
+
+### [📖 CLAUDE.md - Complete Setup Guide](./CLAUDE.md)
+
+The guide covers:
+- GitHub Codespaces setup (automatic)
+- Local development setup
+- Configuration for VS Code, Claude CLI, Claude Desktop, Cline
+- All available tools and parameters
+- Usage examples and workflows
+- Architecture and troubleshooting
+
+## GitHub Codespaces
+
+This project is optimized for Codespaces with automatic:
+- Dependency installation
+- Port forwarding (port 8000)
+- Environment configuration
+
+Just create a Codespace and run `python server_http.py`!
+
+## Project Structure
+
+```
+├── server.py           # STDIO server
+├── server_http.py      # HTTP server
+├── storage.py          # File-based storage
+├── schemas.py          # Data models
+├── search.py           # Full-text search
+├── content_tools.py    # Content extraction
+├── .vscode/mcp.json    # VS Code configuration
+└── CLAUDE.md           # Complete documentation
+```
+
+## Available Tools (Preview)
+
+- **Content**: `add_content`, `get_node`, `search`
+- **Links**: `add_link`, `link_url`
+- **Extraction**: `extract_by_paragraph`, `extract_for_social_media`, `extract_similar_sections`
+- **Relationships**: `link_relates`, `link_tag`, `link_author`
+- **Utilities**: `reindex`, `combine_related_snippets`
+
+See [CLAUDE.md](./CLAUDE.md) for full documentation.
+
+## License
+
+MIT License - See LICENSE file for details

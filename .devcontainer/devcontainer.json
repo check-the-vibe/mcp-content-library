@@ -15,10 +15,13 @@
   "portsAttributes": {
     "8000": {
       "label": "MCP HTTP Server",
-      "onAutoForward": "notify",
-      "visibility": "public"
+      "onAutoForward": "openPreview",
+      "visibility": "public",
+      "protocol": "http"
     }
   },
+
+  "postStartCommand": "nohup python server_http.py > ${containerWorkspaceFolder}/server_http.log 2>&1 &",
 
   "customizations": {
     "vscode": {

@@ -55,4 +55,31 @@ echo $! > "$PID_FILE"
 
 echo "[devcontainer] MCP server started (pid $(cat "$PID_FILE")); logs: $LOG_FILE"
 
+# Wait for server to be healthy before making port public
+echo "[devcontainer] Waiting for server to be ready..."
+MAX_ATTEMPTS=30
+ATTEMPT=0
+while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+  if curl -fsS http://localhost:$PORT/health > /dev/null 2>&1; then
+    echo "[devcontainer] ✓ Server is healthy!"
+    break
+  fi
+  ATTEMPT=$((ATTEMPT + 1))
+  echo "[devcontainer] Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
+  sleep 1
+done
+
+if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+  echo "[devcontainer] ⚠ Server health check timeout after ${MAX_ATTEMPTS}s"
+else
+  # Make port public in Codespaces
+  if command -v gh &> /dev/null; then
+    echo "[devcontainer] Making port $PORT public via Codespaces..."
+    gh codespace ports visibility $PORT:public -c "$CODESPACE_NAME" 2>/dev/null || true
+    echo "[devcontainer] ✓ Port $PORT is now public"
+  else
+    echo "[devcontainer] Note: gh CLI not available; port visibility must be set manually or is already configured"
+  fi
+fi
+
 exit 0

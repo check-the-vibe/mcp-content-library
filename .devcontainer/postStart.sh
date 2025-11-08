@@ -72,14 +72,7 @@ done
 if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
   echo "[devcontainer] ⚠ Server health check timeout after ${MAX_ATTEMPTS}s"
 else
-  # Make port public in Codespaces
-  if command -v gh &> /dev/null; then
-    echo "[devcontainer] Making port $PORT public via Codespaces..."
-    gh codespace ports visibility $PORT:public -c "$CODESPACE_NAME" 2>/dev/null || true
-    echo "[devcontainer] ✓ Port $PORT is now public"
-  else
-    echo "[devcontainer] Note: gh CLI not available; port visibility must be set manually or is already configured"
-  fi
+  echo "[devcontainer] ✓ Server is ready and accessible at http://0.0.0.0:$PORT"
 fi
 
 exit 0

@@ -1,0 +1,59 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local data
+.mcp_snippets/
+contents/
+*.db
+
+# Logs
+*.log
+server_http.pid
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (keep only essential)
+docs/
+*.md
+!README.md
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Dev configuration
+.claude/
+.devcontainer/
+
+# Temporary files
+tmp/
+*.tmp

@@ -1,0 +1,28 @@
+[Unit]
+Description=MCP Content Library Server
+Documentation=https://github.com/check-the-vibe/mcp-content-library
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/home/%i/mcp-content-library
+Environment="PATH=/home/%i/mcp-content-library/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="MCP_HTTP_HOST=0.0.0.0"
+Environment="MCP_HTTP_PORT=8000"
+Environment="MCP_SNIPPETS_ROOT=/home/%i/.mcp_snippets"
+ExecStart=/home/%i/mcp-content-library/.venv/bin/python /home/%i/mcp-content-library/server_http.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/mcp-content-library.log
+StandardError=append:/var/log/mcp-content-library.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/%i/.mcp_snippets /var/log
+
+[Install]
+WantedBy=multi-user.target

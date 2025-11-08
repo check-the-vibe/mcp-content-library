@@ -197,7 +197,6 @@ def link_url(content_id: str, url: str, title: Optional[str] = None, description
         },
     )
 
-
 def get_content_links(content_id: str) -> List[Dict[str, Any]]:
     """
     Retrieve all link nodes associated with a content node.
@@ -217,6 +216,16 @@ def get_content_links(content_id: str) -> List[Dict[str, Any]]:
             except Exception:
                 continue
     return link_nodes
+
+
+def get_all_content_count() -> int:
+    """
+    Get the total count of stored content items.
+    """
+    try:
+        return len(list(NODE_DIRS["content"].glob("*.json")))
+    except Exception:
+        return 0
 
 
 def iter_content_nodes():

@@ -35,7 +35,11 @@ if [ "$MODE" = "stdio" ]; then
     python server.py
 elif [ "$MODE" = "http" ]; then
     echo "✅ Starting server in HTTP mode..."
-    echo "   Server will be available at: http://0.0.0.0:8000/mcp"
+    echo ""
+    echo "   📍 Web UI:       http://0.0.0.0:8000/"
+    echo "   🔌 MCP Endpoint: http://0.0.0.0:8000/mcp"
+    echo "   ❤️  Health Check: http://0.0.0.0:8000/health"
+    echo ""
     echo "   (Use Ctrl+C to stop)"
     echo ""
     python server_http.py

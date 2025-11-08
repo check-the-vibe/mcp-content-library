@@ -2,7 +2,185 @@
 
 A Model Context Protocol (MCP) server for managing writing content, snippets, and building instant context for AI-assisted writing.
 
-## Features
+## 🚀 Quick Start (One Command)
+
+```bash
+git clone https://github.com/check-the-vibe/mcp-content-library.git
+cd mcp-content-library
+./bootstrap.sh
+```
+
+The bootstrap script will:
+- ✅ Set up Python virtual environment
+- ✅ Install all dependencies
+- ✅ Install Claude CLI (if available)
+- ✅ Configure MCP connection
+- ✅ Provide setup instructions for Codex & OpenCode
+
+**That's it!** The server will be ready to run.
+
+### Alternative Installation Methods
+
+<details>
+<summary><b>🐳 Docker Compose (Recommended for Production)</b></summary>
+
+```bash
+# Build and start the service
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the service
+docker-compose down
+```
+
+Server runs at `http://localhost:8000/`
+
+</details>
+
+<details>
+<summary><b>⚙️ Systemd Service (Linux Auto-Start)</b></summary>
+
+```bash
+# Run bootstrap first
+./bootstrap.sh
+
+# Install systemd service
+./install-systemd.sh
+
+# Service commands
+sudo systemctl status mcp-content-library@$USER
+sudo systemctl restart mcp-content-library@$USER
+sudo journalctl -u mcp-content-library@$USER -f
+```
+
+The service will auto-start on boot and restart on failure.
+
+</details>
+
+<details>
+<summary><b>📝 Manual Installation</b></summary>
+
+```bash
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -e .
+pip install -r requirements.txt
+
+# Create storage directory
+mkdir -p ~/.mcp_snippets
+
+# Run server
+python server_http.py
+```
+
+</details>
+
+## 🌐 Accessing the Server
+
+Once running, the server provides multiple endpoints:
+
+| Endpoint | Purpose | URL |
+|----------|---------|-----|
+| **Web UI** | Friendly dashboard with setup instructions | `http://localhost:8000/` |
+| **MCP Protocol** | Connect AI clients here | `http://localhost:8000/mcp` |
+| **Health Check** | Monitor server status | `http://localhost:8000/health` |
+
+### Public Access (GitHub Codespaces / Cloud)
+
+When running in Codespaces or cloud environments:
+
+```bash
+# Get your public URL
+./get-public-url.sh
+```
+
+**Important:** Make sure port 8000 is set to "Public" visibility in your Codespaces Ports panel.
+
+The web UI at `/` automatically detects and displays your public URL!
+
+## 🤖 Connecting AI Clients
+
+### Claude CLI (Recommended)
+
+After running `./bootstrap.sh`, Claude CLI is automatically configured:
+
+```bash
+# Start the MCP server
+./start.sh
+
+# In another terminal, use Claude
+export CLAUDE_MCP_CONFIG=.claude/mcp_config.json
+claude chat
+```
+
+**Manual Claude CLI Installation:**
+```bash
+# Via npm (recommended)
+npm install -g @anthropic-ai/claude-cli
+
+# Or via pip
+pip install claude-cli
+```
+
+### Claude Desktop & VS Code
+
+Add to your MCP configuration file:
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows:** `%APPDATA%/Claude/claude_desktop_config.json`  
+**VS Code:** `.vscode/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "content-library": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp"
+    }
+  }
+}
+```
+
+For **remote/cloud servers**, replace `localhost:8000` with your public URL.
+
+Restart Claude Desktop or reload VS Code after configuration.
+
+### OpenAI Codex
+
+```bash
+# Install OpenAI Python library
+pip install openai
+
+# Set your API key
+export OPENAI_API_KEY='your-api-key-here'
+
+# Use in your Python code
+import openai
+# Configure to use your MCP endpoint
+```
+
+**Documentation:** https://platform.openai.com/docs/guides/code
+
+### Qwen2.5-Coder (OpenCode)
+
+```bash
+# Install dependencies
+pip install transformers torch
+
+# Download and use model
+from transformers import AutoModelForCausalLM, AutoTokenizer
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-Coder-7B-Instruct")
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-Coder-7B-Instruct")
+```
+
+**Documentation:** https://github.com/QwenLM/Qwen2.5-Coder
+
+## ✨ Features
 
 - **Content Management**: Store and organize content from tweets to full chapters
 - **Graph Relationships**: Link snippets to parent content with typed relationships
@@ -12,31 +190,24 @@ A Model Context Protocol (MCP) server for managing writing content, snippets, an
 - **Social Media Tools**: Extract platform-optimized snippets (Twitter, LinkedIn, Instagram)
 - **Link Tracking**: Associate URLs with content for source attribution
 
-## Quick Start
-
-```bash
-# Clone and setup
-git clone https://github.com/your-username/mcp-content-library.git
-cd mcp-content-library
-
-# Install
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-pip install "mcp[cli]" starlette uvicorn
-
-# Create storage
-mkdir -p ~/.mcp_snippets
-
-# Run server
-python server_http.py  # HTTP mode (recommended)
-# OR
-python server.py       # STDIO mode (for CLI clients)
-```
-
-Server runs at `http://0.0.0.0:8000/mcp` in HTTP mode.
-
 ## Connecting to Claude
+
+### 🌟 New! Visit the Web UI
+
+**Just open `http://localhost:8000/` in your browser!**
+
+The landing page includes:
+- ✅ Server status and health check
+- 📊 Content statistics
+- 🔗 All endpoint URLs (auto-detects public URL)
+- 📖 Quick setup guides for Claude, Codex, and OpenCode
+- 💻 Copy-paste configuration snippets
+
+This is especially useful when sharing your server publicly via Codespaces or cloud hosting.
+
+---
+
+### Detailed Claude Setup (Legacy Documentation)
 
 ### Option 1: Claude CLI (Recommended for this project)
 

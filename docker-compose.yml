@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mcp-content-library:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-content-library
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persistent storage for content
+      - mcp-data:/root/.mcp_snippets
+      # Mount source code for development (comment out for production)
+      # - .:/app
+    environment:
+      - MCP_HTTP_HOST=0.0.0.0
+      - MCP_HTTP_PORT=8000
+      - MCP_SNIPPETS_ROOT=/root/.mcp_snippets
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  mcp-data:
+    driver: local

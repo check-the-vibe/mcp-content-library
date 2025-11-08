@@ -2,12 +2,6 @@
   "name": "MCP Content Library",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
 
-  "features": {
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.11"
-    }
-  },
-
   "postCreateCommand": "bash bootstrap.sh --non-interactive",
 
   "forwardPorts": [8000],
@@ -21,7 +15,7 @@
     }
   },
 
-  "postStartCommand": "bash -c 'source .venv/bin/activate && python server_http.py > /tmp/mcp-server.log 2>&1 &'",
+  "postStartCommand": "bash .devcontainer/postStart.sh",
 
   "customizations": {
     "vscode": {
@@ -30,10 +24,8 @@
         "ms-python.vscode-pylance"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.linting.enabled": true,
-        "python.linting.pylintEnabled": false,
-        "python.formatting.provider": "black"
+        "python.linting.pylintEnabled": false
       }
     }
   },

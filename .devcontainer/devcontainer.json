@@ -1,12 +1,21 @@
 {
   "name": "MCP Content Library",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
 
   "postCreateCommand": "bash bootstrap.sh --non-interactive",
 
   "forwardPorts": [8000],
 
-  "postStartCommand": "bash .devcontainer/postStart.sh",
+  "portsAttributes": {
+    "8000": {
+      "label": "MCP Content Library Server",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "postStartCommand": "bash .devcontainer/postStart.sh && bash .devcontainer/expose-port.sh",
 
   "customizations": {
     "vscode": {
